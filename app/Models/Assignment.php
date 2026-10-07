@@ -18,6 +18,8 @@ class Assignment extends Model
         'id_driver',
         'type',
         'status',
+        'pickup_photo',
+        'delivery_photo',
         'assigned_at',
         'finished_at',
     ];

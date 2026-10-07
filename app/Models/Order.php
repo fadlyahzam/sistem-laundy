@@ -51,6 +51,9 @@ class Order extends Model
         'notes',
         'pickup_schedule',
         'status',
+        'pickup_photo',
+        'delivery_photo',
+        'berat_total',
     ];
 
     protected function casts(): array
@@ -60,6 +63,7 @@ class Order extends Model
             'longitude' => 'decimal:7',
             'distance_km' => 'decimal:2',
             'pickup_schedule' => 'datetime',
+            'berat_total' => 'decimal:2',
         ];
     }
 

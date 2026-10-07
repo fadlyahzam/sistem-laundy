@@ -69,7 +69,7 @@ class PelangganController extends Controller
             'customer_phone' => 'required|string|max:20',
             'id_layanan' => 'required|exists:layanan,id_layanan',
             'id_kategori' => 'nullable|exists:kategori,id_kategori',
-            'quantity' => 'required|numeric|min:0.5',
+            'quantity' => 'nullable|numeric|min:0',
             'address_text' => 'required|string',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
@@ -92,11 +92,11 @@ class PelangganController extends Controller
         $kategoriId = $validated['id_kategori'] ?? null;
         $kategori = $kategoriId ? Kategori::find($kategoriId) : null;
 
-        // Pricing calculation
+        // Pricing calculation (weight will be officially weighed at outlet by Admin)
         $basePrice = (float) $layanan->price_per_kg;
         $kategoriPrice = $kategori ? (float) $kategori->unit_tariff : 0;
         $unitPrice = $basePrice + $kategoriPrice;
-        $qty = (float) $validated['quantity'];
+        $qty = (float) ($validated['quantity'] ?? 0);
         $subtotal = $unitPrice * $qty;
 
         $orderCode = 'LK-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -4));
