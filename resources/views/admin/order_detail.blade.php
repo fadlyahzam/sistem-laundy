@@ -297,6 +297,52 @@
                 </div>
             </div>
 
+            <!-- Driver Proof Photos Card -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                    <span>Bukti Foto Driver</span>
+                    <span class="text-[10px] font-semibold text-[#3da4e0]">Pickup & Antar</span>
+                </h3>
+
+                @if($order->pickup_photo_url || $order->delivery_photo_url)
+                    <div class="space-y-3 text-xs">
+                        @if($order->pickup_photo_url)
+                            <div class="space-y-1.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-700 text-[11px]">Foto Penjemputan</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800">Pickup</span>
+                                </div>
+                                <a href="{{ $order->pickup_photo_url }}" target="_blank" class="block aspect-video rounded-lg overflow-hidden border border-slate-200 group relative bg-black/5">
+                                    <img src="{{ $order->pickup_photo_url }}" alt="Bukti Foto Penjemputan" class="w-full h-full object-cover group-hover:scale-105 transition duration-200">
+                                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold">
+                                        Perbesar Foto ↗
+                                    </div>
+                                </a>
+                            </div>
+                        @endif
+
+                        @if($order->delivery_photo_url)
+                            <div class="space-y-1.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-700 text-[11px]">Foto Serah Terima</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">Delivery</span>
+                                </div>
+                                <a href="{{ $order->delivery_photo_url }}" target="_blank" class="block aspect-video rounded-lg overflow-hidden border border-slate-200 group relative bg-black/5">
+                                    <img src="{{ $order->delivery_photo_url }}" alt="Bukti Foto Pengantaran" class="w-full h-full object-cover group-hover:scale-105 transition duration-200">
+                                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold">
+                                        Perbesar Foto ↗
+                                    </div>
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-center text-xs text-slate-400 italic">
+                        Belum ada foto bukti yang diunggah oleh driver.
+                    </div>
+                @endif
+            </div>
+
         </div>
 
     </div>

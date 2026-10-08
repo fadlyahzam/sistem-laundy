@@ -69,7 +69,6 @@ class PelangganController extends Controller
             'customer_phone' => 'required|string|max:20',
             'id_layanan' => 'required|exists:layanan,id_layanan',
             'id_kategori' => 'nullable|exists:kategori,id_kategori',
-            'quantity' => 'nullable|numeric|min:0',
             'address_text' => 'required|string',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
@@ -92,12 +91,12 @@ class PelangganController extends Controller
         $kategoriId = $validated['id_kategori'] ?? null;
         $kategori = $kategoriId ? Kategori::find($kategoriId) : null;
 
-        // Pricing calculation (weight will be officially weighed at outlet by Admin)
+        // Pricing snapshot (Weight/quantity will strictly be filled ONLY by Admin at outlet upon arrival)
         $basePrice = (float) $layanan->price_per_kg;
         $kategoriPrice = $kategori ? (float) $kategori->unit_tariff : 0;
         $unitPrice = $basePrice + $kategoriPrice;
-        $qty = (float) ($validated['quantity'] ?? 0);
-        $subtotal = $unitPrice * $qty;
+        $qty = 0; // Weighing performed exclusively by Admin at SAMPAI_OUTLET
+        $subtotal = 0;
 
         $orderCode = 'LK-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -4));
 
@@ -183,7 +182,7 @@ class PelangganController extends Controller
         return view('pelanggan.order_detail', compact('order'));
     }
 
-    public function payOrder($id)
+    public function payOrder(Request $request, $id)
     {
         $order = Order::with('invoice.latestPayment')
             ->where('id_user', Auth::id())
@@ -200,43 +199,29 @@ class PelangganController extends Controller
                 ->with('success', 'Tagihan ini sudah lunas.');
         }
 
-        // Get or generate Midtrans QRIS charge
+        // Get or generate Midtrans QRIS charge (with explicit 30 min expiry)
         $latestPayment = $invoice->latestPayment;
+        $forceRegenerate = $request->boolean('regenerate');
+
+        if ($forceRegenerate && $latestPayment && $latestPayment->status === 'pending') {
+            $latestPayment->update(['status' => 'expired']);
+            $latestPayment = null;
+        }
 
         if (!$latestPayment || $latestPayment->status !== 'pending' || ($latestPayment->expires_at && $latestPayment->expires_at->isPast())) {
             $chargeResult = $this->midtransService->createQrisCharge($invoice, 30);
             $latestPayment = $chargeResult['payment'];
         }
 
-        return view('pelanggan.payment_qris', compact('order', 'invoice', 'latestPayment'));
+        $payment = $latestPayment;
+        $expiresAt = $latestPayment->expires_at;
+
+        return view('pelanggan.pembayaran', compact('order', 'invoice', 'payment', 'latestPayment', 'expiresAt'));
     }
 
-    public function simulatePaymentSuccess($id)
+    public function simulatePaymentSuccess(Request $request, $id)
     {
-        $order = Order::with('invoice.latestPayment')
-            ->where('id_user', Auth::id())
-            ->findOrFail($id);
-
-        $invoice = $order->invoice;
-
-        if (!$invoice || !$invoice->latestPayment) {
-            return back()->with('error', 'Pembayaran tidak ditemukan.');
-        }
-
-        $payment = $invoice->latestPayment;
-
-        // Process webhook notification logic directly for simulation
-        $this->midtransService->processNotification([
-            'order_id' => $payment->gateway_order_id,
-            'status_code' => '200',
-            'gross_amount' => (string) round($invoice->total_amount),
-            'signature_key' => 'mock-simulated-signature',
-            'transaction_status' => 'settlement',
-            'fraud_status' => 'accept',
-        ]);
-
-        return redirect()->route('pelanggan.orders.show', $order->id_order)
-            ->with('success', 'Simulasi Pembayaran Berhasil! Status pesanan kini DIBAYAR.');
+        return app(PembayaranController::class)->simulatePayment($request, $id);
     }
 
     public function profile()

@@ -65,42 +65,182 @@
         @endif
     </div>
 
+    <!-- Existing Proof Photos Showcase (if already uploaded) -->
+    @if($assignment->proof_photo_url || $order->pickup_photo_url || $order->delivery_photo_url)
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Bukti Foto Tersimpan
+            </h4>
+            <div class="grid grid-cols-2 gap-3">
+                @if($order->pickup_photo_url)
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-semibold text-slate-500">Bukti Penjemputan</span>
+                        <a href="{{ $order->pickup_photo_url }}" target="_blank" class="block aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50 group relative">
+                            <img src="{{ $order->pickup_photo_url }}" alt="Bukti Penjemputan" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[11px] font-semibold">
+                                Lihat Foto
+                            </div>
+                        </a>
+                    </div>
+                @endif
+                @if($order->delivery_photo_url)
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-semibold text-slate-500">Bukti Pengantaran</span>
+                        <a href="{{ $order->delivery_photo_url }}" target="_blank" class="block aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50 group relative">
+                            <img src="{{ $order->delivery_photo_url }}" alt="Bukti Pengantaran" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[11px] font-semibold">
+                                Lihat Foto
+                            </div>
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
     <!-- Action Progression Form -->
     @if($assignment->status !== 'completed')
         <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
             <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Aksi Pembaruan Status</h4>
-            <form action="{{ route('driver.tasks.update', $assignment->id_assignment) }}" method="POST">
-                @csrf
-                @if($isPickup)
-                    @if($order->status === \App\Models\Order::STATUS_DRIVER_DITUGASKAN)
-                        <button type="submit" name="target_status" value="LAUNDRY_DIAMBIL"
-                                class="w-full py-3.5 rounded-xl bg-[#3da4e0] hover:bg-[#1b85c8] text-white font-bold text-xs shadow-lg shadow-[#3da4e0]/30 transition">
-                            🧺 Konfirmasi Cucian Sudah Diambil dari Pelanggan
+            
+            @if($isPickup)
+                {{-- Step 1 Pickup: Driver Pickup Confirmation (Requires Photo) --}}
+                @if($order->status === \App\Models\Order::STATUS_DRIVER_DITUGASKAN)
+                    <form action="{{ route('driver.tasks.update', $assignment->id_assignment) }}" 
+                          method="POST" 
+                          enctype="multipart/form-data" 
+                          x-data="{ photoPreview: null }"
+                          class="space-y-3">
+                        @csrf
+                        <input type="hidden" name="target_status" value="LAUNDRY_DIAMBIL">
+
+                        <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-2">
+                            <div class="font-bold flex items-center gap-1.5 text-amber-800">
+                                <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                </svg>
+                                <span>Wajib Unggah Bukti Foto Penjemputan</span>
+                            </div>
+                            <p class="text-[11px] text-amber-700 leading-relaxed">
+                                Ambil foto cucian saat diserahkan oleh pelanggan di lokasi penjemputan sebagai bukti resmi serah terima.
+                            </p>
+
+                            <!-- Photo Input & Preview -->
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Ambil Foto / Pilih Gambar</label>
+                                <input type="file" 
+                                       name="proof_photo" 
+                                       accept="image/*" 
+                                       capture="environment" 
+                                       required
+                                       @change="const file = $event.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = (e) => photoPreview = e.target.result; reader.readAsDataURL(file); }"
+                                       class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#3da4e0] file:text-white hover:file:bg-[#1b85c8] cursor-pointer">
+                                @error('proof_photo')
+                                    <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Live Image Preview Box -->
+                            <div x-show="photoPreview" x-cloak class="mt-2">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Preview Foto:</span>
+                                <div class="mt-1 relative w-full h-44 rounded-xl overflow-hidden border border-slate-300 shadow-inner bg-slate-100">
+                                    <img :src="photoPreview" alt="Preview Foto Penjemputan" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                                class="w-full py-3.5 rounded-xl bg-[#3da4e0] hover:bg-[#1b85c8] text-white font-bold text-xs shadow-lg shadow-[#3da4e0]/30 transition flex items-center justify-center gap-2">
+                            <span>🧺 Konfirmasi & Unggah Bukti Penjemputan</span>
                         </button>
-                    @elseif($order->status === \App\Models\Order::STATUS_LAUNDRY_DIAMBIL)
-                        <button type="submit" name="target_status" value="SAMPAI_OUTLET"
-                                class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition">
-                            🏠 Konfirmasi Sudah Sampai di Outlet
+                    </form>
+
+                {{-- Step 2 Pickup: Arrived at Outlet (No photo needed, just status update) --}}
+                @elseif($order->status === \App\Models\Order::STATUS_LAUNDRY_DIAMBIL)
+                    <form action="{{ route('driver.tasks.update', $assignment->id_assignment) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="target_status" value="SAMPAI_OUTLET">
+                        <button type="submit"
+                                class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+                            <span>🏠 Konfirmasi Sudah Sampai di Outlet</span>
                         </button>
-                    @endif
-                @else
-                    @if($order->status === \App\Models\Order::STATUS_DRIVER_DITUGASKAN || $order->status === \App\Models\Order::STATUS_SIAP_DIANTAR)
-                        <button type="submit" name="target_status" value="MENUNGGU_PENGANTARAN"
-                                class="w-full py-3.5 rounded-xl bg-[#3da4e0] hover:bg-[#1b85c8] text-white font-bold text-xs shadow-lg shadow-[#3da4e0]/30 transition">
-                            🛵 Mulai Pengantaran ke Lokasi Pelanggan
-                        </button>
-                    @elseif($order->status === \App\Models\Order::STATUS_MENUNGGU_PENGANTARAN)
-                        <button type="submit" name="target_status" value="SELESAI"
-                                class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition">
-                            ✓ Selesai Antar (Cucian Diterima Pelanggan)
-                        </button>
-                    @endif
+                    </form>
                 @endif
-            </form>
+
+            @else
+                {{-- Step 1 Delivery: Start Delivering --}}
+                @if($order->status === \App\Models\Order::STATUS_DRIVER_DITUGASKAN || $order->status === \App\Models\Order::STATUS_SIAP_DIANTAR)
+                    <form action="{{ route('driver.tasks.update', $assignment->id_assignment) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="target_status" value="MENUNGGU_PENGANTARAN">
+                        <button type="submit"
+                                class="w-full py-3.5 rounded-xl bg-[#3da4e0] hover:bg-[#1b85c8] text-white font-bold text-xs shadow-lg shadow-[#3da4e0]/30 transition flex items-center justify-center gap-2">
+                            <span>🛵 Mulai Pengantaran ke Lokasi Pelanggan</span>
+                        </button>
+                    </form>
+
+                {{-- Step 2 Delivery: Complete Delivery (Requires Photo Proof) --}}
+                @elseif($order->status === \App\Models\Order::STATUS_MENUNGGU_PENGANTARAN)
+                    <form action="{{ route('driver.tasks.update', $assignment->id_assignment) }}" 
+                          method="POST" 
+                          enctype="multipart/form-data" 
+                          x-data="{ photoPreview: null }"
+                          class="space-y-3">
+                        @csrf
+                        <input type="hidden" name="target_status" value="SELESAI">
+
+                        <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-2">
+                            <div class="font-bold flex items-center gap-1.5 text-emerald-800">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                </svg>
+                                <span>Wajib Unggah Bukti Foto Serah Terima / Sampai Tujuan</span>
+                            </div>
+                            <p class="text-[11px] text-emerald-700 leading-relaxed">
+                                Ambil foto pakaian bersih yang telah diserahkan kepada pelanggan di lokasi tujuan sebagai bukti tugas selesai.
+                            </p>
+
+                            <!-- Photo Input & Preview -->
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Ambil Foto / Pilih Gambar</label>
+                                <input type="file" 
+                                       name="proof_photo" 
+                                       accept="image/*" 
+                                       capture="environment" 
+                                       required
+                                       @change="const file = $event.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = (e) => photoPreview = e.target.result; reader.readAsDataURL(file); }"
+                                       class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
+                                @error('proof_photo')
+                                    <p class="text-[11px] text-rose-500 mt-1 font-semibold">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Live Image Preview Box -->
+                            <div x-show="photoPreview" x-cloak class="mt-2">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Preview Foto:</span>
+                                <div class="mt-1 relative w-full h-44 rounded-xl overflow-hidden border border-slate-300 shadow-inner bg-slate-100">
+                                    <img :src="photoPreview" alt="Preview Foto Serah Terima" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                                class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+                            <span>✓ Selesai Antar & Unggah Bukti</span>
+                        </button>
+                    </form>
+                @endif
+            @endif
+
         </div>
     @else
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold text-center">
-            ✓ Tugas ini telah selesai dikerjakan pada {{ $assignment->finished_at ? $assignment->finished_at->format('d M Y, H:i') : '' }}.
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold text-center space-y-1">
+            <div class="text-base">✓</div>
+            <div>Tugas ini telah selesai dikerjakan pada {{ $assignment->finished_at ? $assignment->finished_at->format('d M Y, H:i') : '' }}.</div>
         </div>
     @endif
 

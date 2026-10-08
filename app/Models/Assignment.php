@@ -20,9 +20,19 @@ class Assignment extends Model
         'status',
         'pickup_photo',
         'delivery_photo',
+        'proof_photo',
         'assigned_at',
         'finished_at',
     ];
+
+    public function getProofPhotoUrlAttribute(): ?string
+    {
+        $photo = $this->proof_photo ?? ($this->type === 'pickup' ? $this->pickup_photo : $this->delivery_photo);
+        if ($photo) {
+            return str_starts_with($photo, 'http') ? $photo : asset('storage/' . $photo);
+        }
+        return null;
+    }
 
     protected function casts(): array
     {

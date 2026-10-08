@@ -180,7 +180,10 @@ class AdminController extends Controller
             );
 
             $fromStatus = $order->status;
-            $order->update(['status' => Order::STATUS_MENUNGGU_PEMBAYARAN]);
+            $order->update([
+                'status' => Order::STATUS_MENUNGGU_PEMBAYARAN,
+                'berat_total' => $qty,
+            ]);
 
             $note = "Penimbangan selesai: {$qty} kg. Tagihan diterbitkan sebesar Rp " . number_format($subtotal, 0, ',', '.') . " (Status: Menunggu Pembayaran).";
 

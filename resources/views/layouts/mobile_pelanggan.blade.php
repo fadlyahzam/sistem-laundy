@@ -11,6 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <!-- Leaflet CSS for Map picker -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
@@ -91,43 +94,39 @@
             </main>
 
             <!-- Bottom Navigation Bar (Pelanggan: Beranda, Pesanan, Profil) -->
-            <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-                <div class="max-w-md mx-auto grid grid-cols-3 h-16 items-center px-3">
-                    
-                    <!-- 1. Beranda -->
-                    <a href="{{ route('pelanggan.dashboard') }}" 
-                       class="flex flex-col items-center justify-center gap-1 py-1.5 transition {{ request()->routeIs('pelanggan.dashboard') ? 'text-[#3da4e0] font-bold' : 'text-slate-500 hover:text-slate-800 font-medium' }}">
-                        <div class="relative {{ request()->routeIs('pelanggan.dashboard') ? 'scale-110' : '' }} transition-transform">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('pelanggan.dashboard') ? '2.3' : '1.8' }}" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                        </div>
-                        <span class="text-[11px] leading-tight">Beranda</span>
-                    </a>
+            <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-slate-200 flex justify-around py-2.5 z-50 shadow-lg">
+                <!-- 1. Beranda -->
+                <a href="{{ route('pelanggan.dashboard') }}" 
+                   class="flex flex-col items-center justify-center gap-1 flex-1 py-0.5 transition {{ request()->routeIs('pelanggan.dashboard') ? 'text-[#3da4e0] font-bold' : 'text-slate-500 hover:text-slate-800 font-medium' }}">
+                    <div class="relative {{ request()->routeIs('pelanggan.dashboard') ? 'scale-110' : '' }} transition-transform">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('pelanggan.dashboard') ? '2.3' : '1.8' }}" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                    </div>
+                    <span class="text-[11px] leading-tight">Beranda</span>
+                </a>
 
-                    <!-- 2. Pesanan -->
-                    <a href="{{ route('pelanggan.orders') }}" 
-                       class="flex flex-col items-center justify-center gap-1 py-1.5 transition {{ request()->routeIs('pelanggan.orders*') ? 'text-[#3da4e0] font-bold' : 'text-slate-500 hover:text-slate-800 font-medium' }}">
-                        <div class="relative {{ request()->routeIs('pelanggan.orders*') ? 'scale-110' : '' }} transition-transform">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('pelanggan.orders*') ? '2.3' : '1.8' }}" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                            </svg>
-                        </div>
-                        <span class="text-[11px] leading-tight">Pesanan</span>
-                    </a>
+                <!-- 2. Pesanan -->
+                <a href="{{ route('pelanggan.orders') }}" 
+                   class="flex flex-col items-center justify-center gap-1 flex-1 py-0.5 transition {{ request()->routeIs('pelanggan.orders*') ? 'text-[#3da4e0] font-bold' : 'text-slate-500 hover:text-slate-800 font-medium' }}">
+                    <div class="relative {{ request()->routeIs('pelanggan.orders*') ? 'scale-110' : '' }} transition-transform">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('pelanggan.orders*') ? '2.3' : '1.8' }}" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                    </div>
+                    <span class="text-[11px] leading-tight">Pesanan</span>
+                </a>
 
-                    <!-- 3. Profil -->
-                    <a href="{{ route('pelanggan.profile') }}" 
-                       class="flex flex-col items-center justify-center gap-1 py-1.5 transition {{ request()->routeIs('pelanggan.profile*') ? 'text-[#3da4e0] font-bold' : 'text-slate-500 hover:text-slate-800 font-medium' }}">
-                        <div class="relative {{ request()->routeIs('pelanggan.profile*') ? 'scale-110' : '' }} transition-transform">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('pelanggan.profile*') ? '2.3' : '1.8' }}" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </div>
-                        <span class="text-[11px] leading-tight">Profil</span>
-                    </a>
-
-                </div>
+                <!-- 3. Profil -->
+                <a href="{{ route('pelanggan.profile') }}" 
+                   class="flex flex-col items-center justify-center gap-1 flex-1 py-0.5 transition {{ request()->routeIs('pelanggan.profile*') ? 'text-[#3da4e0] font-bold' : 'text-slate-500 hover:text-slate-800 font-medium' }}">
+                    <div class="relative {{ request()->routeIs('pelanggan.profile*') ? 'scale-110' : '' }} transition-transform">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('pelanggan.profile*') ? '2.3' : '1.8' }}" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <span class="text-[11px] leading-tight">Profil</span>
+                </a>
             </nav>
 
         </div>

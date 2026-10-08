@@ -84,17 +84,43 @@ class DriverController extends Controller
 
         $targetStatus = $request->input('target_status');
 
+        if ($targetStatus === 'LAUNDRY_DIAMBIL') {
+            $request->validate([
+                'proof_photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+            ], [
+                'proof_photo.required' => 'Wajib mengunggah bukti foto penjemputan pakaian!',
+                'proof_photo.image' => 'File bukti harus berupa gambar (foto).',
+                'proof_photo.max' => 'Ukuran foto maksimal 5MB.',
+            ]);
+        } elseif ($targetStatus === 'SELESAI') {
+            $request->validate([
+                'proof_photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+            ], [
+                'proof_photo.required' => 'Wajib mengunggah bukti foto serah terima / sampai tujuan!',
+                'proof_photo.image' => 'File bukti harus berupa gambar (foto).',
+                'proof_photo.max' => 'Ukuran foto maksimal 5MB.',
+            ]);
+        }
+
         DB::beginTransaction();
         try {
             $fromStatus = $order->status;
 
             if ($targetStatus === 'LAUNDRY_DIAMBIL') {
+                $path = $request->file('proof_photo')->store('proofs', 'public');
+
                 $assignment->update([
+                    'proof_photo' => $path,
+                    'pickup_photo' => $path,
                     'status' => 'in_progress',
                     'assigned_at' => $assignment->assigned_at ?? Carbon::now(),
                 ]);
-                $order->update(['status' => Order::STATUS_LAUNDRY_DIAMBIL]);
-                $note = 'Driver telah menjemput pakaian dari lokasi pelanggan.';
+                $order->update([
+                    'proof_photo' => $path,
+                    'pickup_photo' => $path,
+                    'status' => Order::STATUS_LAUNDRY_DIAMBIL,
+                ]);
+                $note = 'Driver telah menjemput pakaian dari lokasi pelanggan (Foto bukti terlampir).';
             } elseif ($targetStatus === 'SAMPAI_OUTLET') {
                 $assignment->update([
                     'status' => 'completed',
@@ -111,12 +137,20 @@ class DriverController extends Controller
                 $order->update(['status' => Order::STATUS_MENUNGGU_PENGANTARAN]);
                 $note = 'Driver sedang dalam perjalanan mengantar cucian bersih ke pelanggan.';
             } elseif ($targetStatus === 'SELESAI') {
+                $path = $request->file('proof_photo')->store('proofs', 'public');
+
                 $assignment->update([
+                    'proof_photo' => $path,
+                    'delivery_photo' => $path,
                     'status' => 'completed',
                     'finished_at' => Carbon::now(),
                 ]);
-                $order->update(['status' => Order::STATUS_SELESAI]);
-                $note = 'Cucian telah sukses diantar dan diterima oleh pelanggan.';
+                $order->update([
+                    'proof_photo' => $path,
+                    'delivery_photo' => $path,
+                    'status' => Order::STATUS_SELESAI,
+                ]);
+                $note = 'Cucian telah sukses diantar dan diterima oleh pelanggan (Foto bukti serah terima terlampir).';
                 $driver->update(['availability' => 'available']);
             } else {
                 return back()->with('error', 'Status transisi tidak valid.');

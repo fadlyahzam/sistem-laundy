@@ -53,8 +53,27 @@ class Order extends Model
         'status',
         'pickup_photo',
         'delivery_photo',
+        'proof_photo',
         'berat_total',
     ];
+
+    public function getPickupPhotoUrlAttribute(): ?string
+    {
+        $photo = $this->pickup_photo ?? ($this->pickupAssignment?->proof_photo ?? $this->pickupAssignment?->pickup_photo);
+        if ($photo) {
+            return str_starts_with($photo, 'http') ? $photo : asset('storage/' . $photo);
+        }
+        return null;
+    }
+
+    public function getDeliveryPhotoUrlAttribute(): ?string
+    {
+        $photo = $this->delivery_photo ?? ($this->deliveryAssignment?->proof_photo ?? $this->deliveryAssignment?->delivery_photo);
+        if ($photo) {
+            return str_starts_with($photo, 'http') ? $photo : asset('storage/' . $photo);
+        }
+        return null;
+    }
 
     protected function casts(): array
     {

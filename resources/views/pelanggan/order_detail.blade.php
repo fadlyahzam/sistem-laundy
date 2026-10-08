@@ -85,11 +85,19 @@
                             <p class="text-[11px] text-slate-500">+ {{ $item->kategori->name }}</p>
                         @endif
                         <span class="text-[10px] text-slate-400">
-                            {{ $item->quantity }} {{ $item->layanan->service_type === 'kiloan' ? 'Kg' : 'Pcs' }} × Rp {{ number_format($item->price_snapshot, 0, ',', '.') }}
+                            @if($item->quantity > 0)
+                                {{ $item->quantity }} {{ $item->layanan->service_type === 'kiloan' ? 'Kg' : 'Pcs' }} × Rp {{ number_format($item->price_snapshot, 0, ',', '.') }}
+                            @else
+                                <span class="text-amber-600 font-semibold italic">⚖️ Menunggu penimbangan di outlet</span>
+                            @endif
                         </span>
                     </div>
                     <span class="text-xs font-extrabold text-slate-900">
-                        Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                        @if($item->subtotal > 0)
+                            Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                        @else
+                            <span class="text-[11px] text-slate-400 font-normal">Akan dihitung</span>
+                        @endif
                     </span>
                 </div>
             @endforeach
@@ -110,8 +118,47 @@
                     </span>
                 </div>
             </div>
+        @else
+            <div class="pt-2.5 border-t border-slate-100 bg-sky-50/70 p-2.5 rounded-xl text-[11px] text-sky-800 flex items-center gap-2">
+                <span>ℹ️</span>
+                <span>Tagihan akan diterbitkan admin setelah pakaian ditimbang resmi di outlet.</span>
+            </div>
         @endif
     </div>
+
+    <!-- 4.1. Bukti Foto Driver (Jika Tersedia) -->
+    @if($order->pickup_photo_url || $order->delivery_photo_url)
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                <span>Bukti Foto dari Driver</span>
+                <span class="text-[10px] font-bold text-emerald-600">Dokumentasi</span>
+            </h3>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+                @if($order->pickup_photo_url)
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-semibold text-slate-500">Foto Penjemputan</span>
+                        <a href="{{ $order->pickup_photo_url }}" target="_blank" class="block aspect-video rounded-xl overflow-hidden border border-slate-200 group relative bg-black/5">
+                            <img src="{{ $order->pickup_photo_url }}" alt="Bukti Penjemputan" class="w-full h-full object-cover group-hover:scale-105 transition duration-200">
+                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold">
+                                Buka Foto ↗
+                            </div>
+                        </a>
+                    </div>
+                @endif
+                @if($order->delivery_photo_url)
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-semibold text-slate-500">Foto Pengantaran</span>
+                        <a href="{{ $order->delivery_photo_url }}" target="_blank" class="block aspect-video rounded-xl overflow-hidden border border-slate-200 group relative bg-black/5">
+                            <img src="{{ $order->delivery_photo_url }}" alt="Bukti Pengantaran" class="w-full h-full object-cover group-hover:scale-105 transition duration-200">
+                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold">
+                                Buka Foto ↗
+                            </div>
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
 
     <!-- 5. Lokasi Penjemputan -->
     <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-2">

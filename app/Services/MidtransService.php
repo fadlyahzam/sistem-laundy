@@ -63,7 +63,7 @@ class MidtransService
         $gatewayOrderId = $invoice->invoice_number . '-' . time();
         $grossAmount = (int) round($invoice->total_amount);
         $orderTime = Carbon::now('Asia/Jakarta')->format('Y-m-d H:i:s O');
-        $expiresAt = Carbon::now()->addMinutes($expiryMinutes);
+        $expiresAt = now()->addMinutes(30);
 
         $payload = [
             'payment_type' => 'qris',
@@ -88,8 +88,7 @@ class MidtransService
                 'acquirer' => 'gopay',
             ],
             'custom_expiry' => [
-                'order_time' => $orderTime,
-                'expiry_duration' => $expiryMinutes,
+                'expiry_duration' => 30,
                 'unit' => 'minute',
             ],
         ];
