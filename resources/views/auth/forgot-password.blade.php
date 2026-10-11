@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Masuk - LaundryKu</title>
+    <title>Lupa Kata Sandi - LaundryKu</title>
     
     <!-- FOUC Prevention Script -->
     <script>
@@ -83,7 +83,8 @@
                 </div>
             </a>
             <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Laundry<span class="text-[#3da4e0] font-extrabold">Ku</span></h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Silakan masuk dengan akun terdaftar Anda</p>
+            <p class="text-sm font-bold text-slate-700 dark:text-slate-200">Atur Ulang Kata Sandi</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Masukkan email atau nomor telepon Anda untuk langsung memperbarui kata sandi</p>
         </div>
 
         @if(session('success'))
@@ -100,19 +101,20 @@
             </div>
         @endif
 
-        <!-- Login Form -->
-        <form action="{{ route('login') }}" method="POST" class="space-y-4">
+        <!-- Direct Password Reset Form -->
+        <form action="{{ route('password.update') }}" method="POST" class="space-y-4">
             @csrf
 
+            <!-- Email / No. Telepon -->
             <div>
-                <label for="email-input" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Alamat Email</label>
+                <label for="email-input" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email / No. Telepon</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
-                        <i class="fa-solid fa-envelope text-xs"></i>
+                        <i class="fa-solid fa-user-check text-xs"></i>
                     </span>
-                    <input type="email" name="email" id="email-input" required value="{{ old('email') }}"
+                    <input type="text" name="email" id="email-input" required value="{{ old('email') }}"
                            class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3da4e0] focus:border-transparent transition placeholder-slate-400 dark:placeholder-slate-500"
-                           placeholder="nama@email.com">
+                           placeholder="nama@email.com atau 08123456789">
                 </div>
                 @error('email')
                     <p class="text-xs text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
@@ -121,15 +123,16 @@
                 @enderror
             </div>
 
+            <!-- Password Baru -->
             <div>
-                <label for="password-input" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Kata Sandi</label>
+                <label for="password-input" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password Baru</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                         <i class="fa-solid fa-lock text-xs"></i>
                     </span>
                     <input type="password" name="password" id="password-input" required
                            class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3da4e0] focus:border-transparent transition placeholder-slate-400 dark:placeholder-slate-500"
-                           placeholder="••••••••">
+                           placeholder="Minimal 6 karakter">
                 </div>
                 @error('password')
                     <p class="text-xs text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
@@ -138,27 +141,30 @@
                 @enderror
             </div>
 
-            <div class="flex items-center justify-between text-xs pt-1">
-                <label class="flex items-center gap-2 cursor-pointer select-none">
-                    <input type="checkbox" name="remember" class="rounded border-slate-300 dark:border-slate-700 text-[#3da4e0] focus:ring-[#3da4e0] bg-white dark:bg-slate-800">
-                    <span class="text-slate-600 dark:text-slate-400 font-medium">Ingat saya</span>
-                </label>
-                <a href="{{ route('password.request') }}" class="font-semibold text-[#3da4e0] hover:underline">
-                    Lupa Password?
-                </a>
+            <!-- Konfirmasi Password Baru -->
+            <div>
+                <label for="password_confirmation-input" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Konfirmasi Password Baru</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                        <i class="fa-solid fa-shield-halved text-xs"></i>
+                    </span>
+                    <input type="password" name="password_confirmation" id="password_confirmation-input" required
+                           class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3da4e0] focus:border-transparent transition placeholder-slate-400 dark:placeholder-slate-500"
+                           placeholder="Ketik ulang password baru">
+                </div>
             </div>
 
             <button type="submit" 
                     class="w-full py-3 px-4 rounded-xl font-bold text-sm bg-[#3da4e0] hover:bg-[#1b85c8] text-white shadow-lg shadow-[#3da4e0]/30 transition active:scale-[0.99] flex items-center justify-center gap-2">
-                <span>Masuk ke Aplikasi</span>
+                <span>Perbarui Password &amp; Masuk</span>
                 <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
         </form>
 
         <div class="text-center space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
             <p class="text-xs text-slate-500 dark:text-slate-400">
-                Belum punya akun? 
-                <a href="{{ route('register') }}" class="font-bold text-[#3da4e0] hover:underline">Daftar sekarang</a>
+                Sudah ingat kata sandi Anda? 
+                <a href="{{ route('login') }}" class="font-bold text-[#3da4e0] hover:underline">Masuk disini</a>
             </p>
             <div>
                 <a href="{{ route('welcome') }}" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition">

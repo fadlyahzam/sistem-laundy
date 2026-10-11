@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\MidtransWebhookController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\PembayaranController;
@@ -10,10 +12,10 @@ use App\Services\DistanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Root redirect
+// Welcome Landing Page (Mobile-First)
 Route::get('/', function () {
-    return redirect()->route('login');
-});
+    return view('welcome');
+})->name('welcome');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -21,7 +23,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    
+    // Direct Forgot Password & Reset Flow
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 });
+
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
@@ -81,17 +88,23 @@ Route::middleware(['auth', 'role:driver'])->prefix('driver')->name('driver.')->g
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
+    Route::get('/orderan', [AdminController::class, 'orders'])->name('orderan');
     Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
     Route::post('/orders/{id}/assign-driver', [AdminController::class, 'assignDriver'])->name('orders.assign_driver');
     Route::post('/orders/{id}/issue-invoice', [AdminController::class, 'issueInvoice'])->name('orders.issue_invoice');
     Route::post('/orders/{id}/update-status', [AdminController::class, 'updateOrderStatus'])->name('orders.update_status');
-    Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports');
+    Route::get('/laporan', [AdminReportController::class, 'index'])->name('laporan');
+    Route::get('/laporan/export-excel', [AdminReportController::class, 'exportExcel'])->name('laporan.export_excel');
+    Route::get('/laporan/export-pdf', [AdminReportController::class, 'exportPdf'])->name('laporan.export_pdf');
     Route::get('/products', [AdminController::class, 'products'])->name('products');
+    Route::get('/produk', [AdminController::class, 'products'])->name('produk');
     Route::post('/layanan', [AdminController::class, 'storeLayanan'])->name('layanan.store');
     Route::put('/layanan/{id}', [AdminController::class, 'updateLayanan'])->name('layanan.update');
     Route::delete('/layanan/{id}', [AdminController::class, 'deleteLayanan'])->name('layanan.delete');
     Route::post('/kategori', [AdminController::class, 'storeKategori'])->name('kategori.store');
     Route::delete('/kategori/{id}', [AdminController::class, 'deleteKategori'])->name('kategori.delete');
     Route::get('/drivers', [AdminController::class, 'drivers'])->name('drivers');
+    Route::get('/driver', [AdminController::class, 'drivers'])->name('driver');
     Route::post('/drivers', [AdminController::class, 'storeDriver'])->name('drivers.store');
 });

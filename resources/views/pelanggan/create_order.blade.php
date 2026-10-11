@@ -4,16 +4,21 @@
 <div class="space-y-5 w-full max-w-full overflow-hidden" x-data="orderForm()">
     
     <!-- Header Banner -->
-    <div class="w-full max-w-full overflow-hidden bg-gradient-to-r from-[#3da4e0] to-[#1b85c8] rounded-2xl p-4 text-white shadow-lg shadow-[#3da4e0]/20 flex items-center justify-between">
-        <div class="min-w-0 flex-1 mr-3">
-            <span class="inline-block px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold uppercase tracking-wider mb-1">Pesan Antar Jemput</span>
-            <h2 class="text-lg font-extrabold leading-tight truncate">Buat Pesanan Laundry</h2>
-            <p class="text-xs text-white/85 mt-0.5 truncate">Driver kami siap jemput ke lokasi Anda!</p>
+    <div class="w-full max-w-full overflow-hidden rounded-2xl p-4.5 sm:p-5 text-white shadow-xl shadow-[#3da4e0]/25 flex items-center justify-between bg-[#3da4e0] bg-gradient-to-r from-[#3da4e0] via-[#2ba0e5] to-[#167dc0]"
+         style="background: linear-gradient(135deg, #3da4e0 0%, #2092d6 50%, #167dc0 100%) !important;">
+        <div class="min-w-0 flex-1 mr-3 space-y-1">
+            <span class="inline-block px-2.5 py-0.5 rounded-full bg-white text-[#166ba2] text-[10px] font-black uppercase tracking-wider shadow-sm">
+                Pesan Antar Jemput
+            </span>
+            <h2 class="text-xl font-black text-white leading-tight drop-shadow-sm truncate">
+                Buat Pesanan Laundry
+            </h2>
+            <p class="text-xs text-sky-100 font-medium leading-relaxed truncate">
+                Driver kami siap jemput & antar cucian Anda sampai wangi!
+            </p>
         </div>
-        <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
-            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+        <div class="w-12 h-12 rounded-2xl bg-white text-[#3da4e0] flex items-center justify-center shrink-0 shadow-md">
+            <i class="fa-solid fa-shirt text-xl"></i>
         </div>
     </div>
 
@@ -22,8 +27,8 @@
         @csrf
 
         <!-- 1. Data Pelanggan -->
-        <div class="w-full max-w-full overflow-hidden bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+        <div class="w-full max-w-full overflow-hidden bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 flex items-center gap-1.5">
                 <svg class="w-4 h-4 text-[#3da4e0]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -31,9 +36,9 @@
             </h3>
 
             <div class="w-full max-w-full overflow-hidden">
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap</label>
                 <input type="text" name="customer_name" required value="{{ old('customer_name', auth()->user()->name ?? '') }}"
-                       class="w-full max-w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da4e0] focus:border-transparent transition"
+                       class="w-full max-w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3da4e0] focus:border-transparent transition"
                        placeholder="Contoh: Budi Santoso">
                 @error('customer_name')
                     <p class="text-xs text-rose-500 mt-1">{{ $message }}</p>
@@ -41,9 +46,9 @@
             </div>
 
             <div class="w-full max-w-full overflow-hidden">
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp / HP</label>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nomor WhatsApp / HP</label>
                 <input type="tel" name="customer_phone" required value="{{ old('customer_phone', auth()->user()->phone ?? '') }}"
-                       class="w-full max-w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da4e0] focus:border-transparent transition"
+                       class="w-full max-w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3da4e0] focus:border-transparent transition"
                        placeholder="Contoh: 081234567890">
                 @error('customer_phone')
                     <p class="text-xs text-rose-500 mt-1">{{ $message }}</p>
@@ -52,11 +57,9 @@
         </div>
 
         <!-- 2. Pilih Layanan & Kategori -->
-        <div class="w-full max-w-full overflow-hidden bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-[#3da4e0]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                </svg>
+        <div class="w-full max-w-full overflow-hidden bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-shirt text-sm text-[#3da4e0]"></i>
                 Pilihan Paket Laundry
             </h3>
 

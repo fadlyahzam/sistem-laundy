@@ -256,31 +256,9 @@ class AdminController extends Controller
         }
     }
 
-    public function reports()
+    public function reports(Request $request)
     {
-        $totalPaidRevenue = Invoice::where('status', 'paid')->sum('total_amount');
-        $totalOrdersCount = Order::count();
-        $completedOrdersCount = Order::where('status', Order::STATUS_SELESAI)->count();
-
-        // Monthly stats for current year
-        $monthlyRevenue = Invoice::where('status', 'paid')
-            ->whereYear('paid_at', Carbon::now()->year)
-            ->selectRaw('MONTH(paid_at) as month, SUM(total_amount) as total')
-            ->groupBy('month')
-            ->pluck('total', 'month')
-            ->all();
-
-        $recentInvoices = Invoice::with(['order.user'])
-            ->latest('id_invoice')
-            ->paginate(15);
-
-        return view('admin.reports', compact(
-            'totalPaidRevenue',
-            'totalOrdersCount',
-            'completedOrdersCount',
-            'monthlyRevenue',
-            'recentInvoices'
-        ));
+        return app(AdminReportController::class)->index($request);
     }
 
     public function products()

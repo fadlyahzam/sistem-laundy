@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
@@ -34,3 +37,131 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+/* Custom scrollbar for sidebar navigation */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+/* Global Dark Mode Enhancements & Color Contrast Refinement */
+.dark {
+    color-scheme: dark;
+}
+
+.dark body {
+    background-color: #020617; /* Deep slate-950 page background */
+    color: #f8fafc; /* Crisp slate-50 default text */
+}
+
+/* Smooth background & border transition when toggling */
+html.dark-transition * {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Page Backgrounds: Deep Slate-950 tones */
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+    background-color: #020617 !important;
+}
+
+/* Cards & Panel Backgrounds: Deep Slate-900 tones */
+.dark .bg-white {
+    background-color: #0f172a !important;
+}
+
+/* Elevated bars & Sub-sections: Slate-800 tones */
+.dark .bg-slate-200 {
+    background-color: #1e293b !important;
+}
+
+/* Dark Mode Text: High-contrast bright hierarchy */
+.dark .text-slate-900,
+.dark .text-slate-800 {
+    color: #f1f5f9 !important; /* Headings: crisp slate-100 */
+}
+
+.dark .text-slate-700,
+.dark .text-slate-600 {
+    color: #cbd5e1 !important; /* Body text: slate-300 */
+}
+
+.dark .text-slate-500,
+.dark .text-slate-400 {
+    color: #94a3b8 !important; /* Subtitles: slate-400 (never dark gray on dark) */
+}
+
+/* Borders: Distinct separation with slate-800 */
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-200\/80,
+.dark .border-slate-200\/70,
+.dark .border-slate-200\/60,
+.dark .border-slate-200\/50,
+.dark .border-slate-300 {
+    border-color: #1e293b !important;
+}
+
+/* Inputs & Form Elements: Slate-900 cards with slate-700 borders */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"])::placeholder,
+.dark textarea::placeholder {
+    color: #94a3b8 !important; /* Clear, readable subtitle tone */
+}
+
+/* Primary Accent (#3da4e0): Keep sharp and vibrant against both light and dark backgrounds */
+.dark .text-primary,
+.dark .text-\[\#3da4e0\],
+.dark .text-primary-500 {
+    color: #3da4e0 !important;
+}
+
+.dark .bg-primary,
+.dark .bg-\[\#3da4e0\],
+.dark .bg-primary-500 {
+    background-color: #3da4e0 !important;
+}
+
+.dark .border-primary,
+.dark .border-\[\#3da4e0\],
+.dark .border-primary-500 {
+    border-color: #3da4e0 !important;
+}
+
+/* Table components in Dark Mode */
+.dark table thead {
+    background-color: #1e293b !important;
+}
+
+.dark table thead th {
+    color: #cbd5e1 !important;
+}
+
+.dark table tbody tr {
+    border-color: #1e293b !important;
+}
+
+.dark table tbody tr:hover {
+    background-color: rgba(30, 41, 59, 0.5) !important;
+}
+

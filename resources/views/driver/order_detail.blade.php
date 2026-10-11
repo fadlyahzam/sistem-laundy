@@ -22,44 +22,46 @@
     </div>
 
     <!-- Map Preview -->
-    <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm relative">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm relative">
         <div id="driver-map" class="w-full h-56 z-10"></div>
-        <div class="p-3 bg-white border-t border-slate-100 flex items-center justify-between text-xs">
+        <div class="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
             <div>
-                <span class="text-slate-500">Jarak Outlet:</span>
-                <span class="font-bold text-slate-900">{{ $order->distance_km }} KM</span>
+                <span class="text-slate-500 dark:text-slate-400">Jarak Outlet:</span>
+                <span class="font-bold text-slate-900 dark:text-white">{{ $order->distance_km }} KM</span>
             </div>
-            <a href="https://www.google.com/maps/dir/?api=1&destination={{ $order->latitude }},{{ $order->longitude }}" 
+            <a href="https://www.google.com/maps/search/?api=1&query={{ $order->latitude }},{{ $order->longitude }}" 
                target="_blank"
-               class="px-3 py-1.5 rounded-lg bg-[#3da4e0] text-white font-bold text-[11px] hover:bg-[#1b85c8] transition flex items-center gap-1">
+               class="px-3 py-1.5 rounded-lg bg-[#3da4e0] text-white font-bold text-[11px] hover:bg-[#1b85c8] transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-location-arrow text-xs"></i>
                 <span>Buka Google Maps</span> &rarr;
             </a>
         </div>
     </div>
 
     <!-- Customer Card -->
-    <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
             <div>
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Data Pelanggan</span>
-                <h3 class="text-base font-extrabold text-slate-900">{{ $order->customer_name }}</h3>
-                <p class="text-xs text-slate-500 font-mono">{{ $order->customer_phone }}</p>
+                <h3 class="text-base font-extrabold text-slate-900 dark:text-white">{{ $order->customer_name }}</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">{{ $order->customer_phone }}</p>
             </div>
             @if($order->customer_phone)
                 <a href="https://wa.me/{{ preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $order->customer_phone)) }}" 
                    target="_blank"
                    class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
                     <span>Chat WhatsApp</span>
                 </a>
             @endif
         </div>
 
-        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700">
-            <strong>Alamat:</strong> {{ $order->address_text }}
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300">
+            <strong class="text-slate-900 dark:text-white">Alamat:</strong> {{ $order->address_text }}
         </div>
 
         @if($order->notes)
-            <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-100 text-[11px] text-amber-800">
+            <div class="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900/40 text-[11px] text-amber-800 dark:text-amber-300">
                 <strong>Catatan Khusus:</strong> {{ $order->notes }}
             </div>
         @endif
