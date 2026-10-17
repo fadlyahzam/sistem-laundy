@@ -60,20 +60,20 @@
                     </p>
                 </div>
 
-                @if($activeOrder->status === \App\Models\Order::STATUS_MENUNGGU_PEMBAYARAN)
-                    <a href="{{ route('pelanggan.orders.pay', $activeOrder->id_order) }}" 
-                       class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-md shadow-amber-500/25 flex items-center gap-1.5 animate-bounce">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                        </svg>
-                        Bayar QRIS
-                    </a>
-                @else
+                <div class="flex items-center gap-1.5">
                     <a href="{{ route('pelanggan.orders.show', $activeOrder->id_order) }}" 
                        class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition">
                         Detail
                     </a>
-                @endif
+
+                    @if($activeOrder->invoice)
+                        <a href="{{ route('pelanggan.orders.invoice', $activeOrder->id_order) }}" 
+                           class="px-3 py-1.5 rounded-xl {{ $activeOrder->invoice->status === 'paid' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-sky-50 dark:bg-sky-950/40 text-[#1b85c8] dark:text-[#3da4e0] border border-sky-200 dark:border-sky-800' }} text-xs font-bold transition flex items-center gap-1">
+                            <i class="fa-solid fa-file-invoice text-[10px]"></i>
+                            <span>{{ $activeOrder->invoice->status === 'paid' ? 'Invoice (Lunas)' : 'Lihat Invoice' }}</span>
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
     @endif

@@ -67,6 +67,12 @@ Route::middleware(['auth', 'role:pelanggan'])->prefix('pelanggan')->name('pelang
     Route::get('/pesanan/{id}/detail', [PelangganController::class, 'showOrder'])->name('pesanan.detail');
     Route::get('/pesanan/{id}/bayar', [PembayaranController::class, 'showPayment'])->name('orders.pay');
     Route::get('/pesanan/{id}/pembayaran', [PembayaranController::class, 'showPayment'])->name('pesanan.pay');
+    Route::get('/invoice', fn() => redirect()->route('pelanggan.orders'))->name('invoices');
+    Route::get('/tagihan', fn() => redirect()->route('pelanggan.orders'))->name('tagihan');
+    Route::get('/pesanan/{id}/invoice', [PembayaranController::class, 'showInvoice'])->name('orders.invoice');
+    Route::get('/pesanan/{id}/lihat-invoice', [PembayaranController::class, 'showInvoice'])->name('pesanan.invoice');
+    Route::get('/pesanan/{id}/cetak-invoice', [PembayaranController::class, 'printInvoice'])->name('orders.print_invoice');
+    Route::get('/pesanan/{id}/cetak-bukti', [PembayaranController::class, 'printReceipt'])->name('orders.print_receipt');
     Route::post('/pesanan/{order}/simulate-pay', [PembayaranController::class, 'simulatePayment'])->name('pesanan.simulate_pay');
     Route::post('/pesanan/{id}/simulasi-bayar', [PembayaranController::class, 'simulatePayment'])->name('orders.simulate_pay');
     Route::get('/profil', [PelangganController::class, 'profile'])->name('profile');
@@ -90,6 +96,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
     Route::get('/orderan', [AdminController::class, 'orders'])->name('orderan');
     Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
+    Route::get('/orders/{id}/cetak-invoice', [AdminController::class, 'printInvoice'])->name('orders.print_invoice');
+    Route::get('/orders/{id}/cetak-bukti', [AdminController::class, 'printReceipt'])->name('orders.print_receipt');
     Route::post('/orders/{id}/assign-driver', [AdminController::class, 'assignDriver'])->name('orders.assign_driver');
     Route::post('/orders/{id}/issue-invoice', [AdminController::class, 'issueInvoice'])->name('orders.issue_invoice');
     Route::post('/orders/{id}/update-status', [AdminController::class, 'updateOrderStatus'])->name('orders.update_status');
@@ -101,10 +109,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/produk', [AdminController::class, 'products'])->name('produk');
     Route::post('/layanan', [AdminController::class, 'storeLayanan'])->name('layanan.store');
     Route::put('/layanan/{id}', [AdminController::class, 'updateLayanan'])->name('layanan.update');
+    Route::post('/layanan/{id}/toggle-status', [AdminController::class, 'toggleLayananStatus'])->name('layanan.toggle_status');
     Route::delete('/layanan/{id}', [AdminController::class, 'deleteLayanan'])->name('layanan.delete');
     Route::post('/kategori', [AdminController::class, 'storeKategori'])->name('kategori.store');
+    Route::put('/kategori/{id}', [AdminController::class, 'updateKategori'])->name('kategori.update');
+    Route::post('/kategori/{id}/toggle-status', [AdminController::class, 'toggleKategoriStatus'])->name('kategori.toggle_status');
     Route::delete('/kategori/{id}', [AdminController::class, 'deleteKategori'])->name('kategori.delete');
     Route::get('/drivers', [AdminController::class, 'drivers'])->name('drivers');
     Route::get('/driver', [AdminController::class, 'drivers'])->name('driver');
     Route::post('/drivers', [AdminController::class, 'storeDriver'])->name('drivers.store');
+    Route::put('/drivers/{id}', [AdminController::class, 'updateDriver'])->name('drivers.update');
+    Route::delete('/drivers/{id}', [AdminController::class, 'deleteDriver'])->name('drivers.delete');
 });
+
+// Fallback route to serve uploaded driver photos / public storage assets reliably
+Route::get('/storage/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
+    if (!file_exists($fullPath)) {
+        abort(404);
+    }
+    return response()->file($fullPath);
+})->where('path', '.*');

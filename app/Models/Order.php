@@ -61,7 +61,11 @@ class Order extends Model
     {
         $photo = $this->pickup_photo ?? ($this->pickupAssignment?->proof_photo ?? $this->pickupAssignment?->pickup_photo);
         if ($photo) {
-            return str_starts_with($photo, 'http') ? $photo : asset('storage/' . $photo);
+            if (str_starts_with($photo, 'http')) {
+                return $photo;
+            }
+            $cleanPath = preg_replace('#^storage/#', '', ltrim($photo, '/'));
+            return asset('storage/' . $cleanPath);
         }
         return null;
     }
@@ -70,7 +74,27 @@ class Order extends Model
     {
         $photo = $this->delivery_photo ?? ($this->deliveryAssignment?->proof_photo ?? $this->deliveryAssignment?->delivery_photo);
         if ($photo) {
-            return str_starts_with($photo, 'http') ? $photo : asset('storage/' . $photo);
+            if (str_starts_with($photo, 'http')) {
+                return $photo;
+            }
+            $cleanPath = preg_replace('#^storage/#', '', ltrim($photo, '/'));
+            return asset('storage/' . $cleanPath);
+        }
+        return null;
+    }
+
+    public function getProofPhotoUrlAttribute(): ?string
+    {
+        $photo = $this->proof_photo 
+            ?? ($this->pickupAssignment?->proof_photo 
+            ?? ($this->deliveryAssignment?->proof_photo 
+            ?? ($this->delivery_photo ?? $this->pickup_photo)));
+        if ($photo) {
+            if (str_starts_with($photo, 'http')) {
+                return $photo;
+            }
+            $cleanPath = preg_replace('#^storage/#', '', ltrim($photo, '/'));
+            return asset('storage/' . $cleanPath);
         }
         return null;
     }

@@ -264,7 +264,12 @@ class AdminController extends Controller
     public function products()
     {
         $layananList = Layanan::with('kategori')->latest('id_layanan')->get();
-        return view('admin.products', compact('layananList'));
+        $totalLayanan = $layananList->count();
+        $kiloanCount = $layananList->where('service_type', 'kiloan')->count();
+        $satuanCount = $layananList->where('service_type', 'satuan')->count();
+        $kategoriCount = Kategori::count();
+
+        return view('admin.products', compact('layananList', 'totalLayanan', 'kiloanCount', 'satuanCount', 'kategoriCount'));
     }
 
     public function storeLayanan(Request $request)
@@ -288,23 +293,42 @@ class AdminController extends Controller
     public function updateLayanan(Request $request, $id)
     {
         $layanan = Layanan::findOrFail($id);
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'service_type' => 'required|in:kiloan,satuan',
             'price_per_kg' => 'required|numeric|min:0',
-            'is_active' => 'required|boolean',
         ]);
 
-        $layanan->update($request->only('name', 'service_type', 'price_per_kg', 'is_active'));
+        $isActive = $request->has('is_active') ? $request->boolean('is_active') : $layanan->is_active;
+
+        $layanan->update([
+            'name' => $request->name,
+            'service_type' => $request->service_type,
+            'price_per_kg' => $request->price_per_kg,
+            'is_active' => $isActive,
+        ]);
 
         return back()->with('success', 'Layanan berhasil diperbarui.');
+    }
+
+    public function toggleLayananStatus($id)
+    {
+        $layanan = Layanan::findOrFail($id);
+        $layanan->update([
+            'is_active' => !$layanan->is_active,
+        ]);
+
+        $statusStr = $layanan->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        return back()->with('success', "Status layanan '{$layanan->name}' berhasil {$statusStr}.");
     }
 
     public function deleteLayanan($id)
     {
         $layanan = Layanan::findOrFail($id);
+        $name = $layanan->name;
         $layanan->delete();
-        return back()->with('success', 'Layanan berhasil dihapus.');
+        return back()->with('success', "Layanan '{$name}' berhasil dihapus.");
     }
 
     public function storeKategori(Request $request)
@@ -325,11 +349,69 @@ class AdminController extends Controller
         return back()->with('success', 'Kategori/item khusus berhasil ditambahkan.');
     }
 
+    public function updateKategori(Request $request, $id)
+    {
+        $kategori = Kategori::findOrFail($id);
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'unit_tariff' => 'required|numeric|min:0',
+        ]);
+
+        $isActive = $request->has('is_active') ? $request->boolean('is_active') : $kategori->is_active;
+
+        $kategori->update([
+            'name' => $request->name,
+            'unit_tariff' => $request->unit_tariff,
+            'is_active' => $isActive,
+        ]);
+
+        return back()->with('success', 'Kategori/item khusus berhasil diperbarui.');
+    }
+
+    public function toggleKategoriStatus($id)
+    {
+        $kategori = Kategori::findOrFail($id);
+        $kategori->update([
+            'is_active' => !$kategori->is_active,
+        ]);
+
+        $statusStr = $kategori->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        return back()->with('success', "Status kategori '{$kategori->name}' berhasil {$statusStr}.");
+    }
+
     public function deleteKategori($id)
     {
         $kategori = Kategori::findOrFail($id);
+        $name = $kategori->name;
         $kategori->delete();
-        return back()->with('success', 'Kategori berhasil dihapus.');
+        return back()->with('success', "Kategori '{$name}' berhasil dihapus.");
+    }
+
+    public function printInvoice($id)
+    {
+        $order = Order::with(['invoice.latestPayment', 'items.layanan', 'items.kategori', 'user'])->findOrFail($id);
+        $invoice = $order->invoice;
+
+        if (!$invoice) {
+            return back()->with('error', 'Tagihan belum diterbitkan untuk pesanan ini.');
+        }
+
+        $payment = $invoice->latestPayment;
+        return view('pelanggan.cetak_invoice', compact('order', 'invoice', 'payment'));
+    }
+
+    public function printReceipt($id)
+    {
+        $order = Order::with(['invoice.latestPayment', 'items.layanan', 'items.kategori', 'user'])->findOrFail($id);
+        $invoice = $order->invoice;
+
+        if (!$invoice || $invoice->status !== 'paid') {
+            return back()->with('error', 'Bukti pelunasan hanya tersedia untuk tagihan yang telah lunas.');
+        }
+
+        $payment = $invoice->latestPayment;
+        return view('pelanggan.cetak_bukti', compact('order', 'invoice', 'payment'));
     }
 
     public function drivers()
@@ -375,6 +457,77 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menambahkan driver: ' . $e->getMessage());
+        }
+    }
+
+    public function updateDriver(Request $request, $id)
+    {
+        $driver = Driver::with('user')->findOrFail($id);
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $driver->id_user . ',id_user',
+            'phone' => 'required|string|max:20',
+            'plate_number' => 'required|string|max:20',
+            'vehicle_type' => 'required|string|max:50',
+            'availability' => 'required|in:available,on_duty,off',
+            'password' => 'nullable|min:6',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $userData = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+            ];
+
+            if ($request->filled('password')) {
+                $userData['password'] = Hash::make($request->password);
+            }
+
+            $driver->user->update($userData);
+
+            $driver->update([
+                'plate_number' => $request->plate_number,
+                'vehicle_type' => $request->vehicle_type,
+                'availability' => $request->availability,
+            ]);
+
+            DB::commit();
+            return back()->with('success', "Data driver '{$driver->user->name}' berhasil diperbarui.");
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal memperbarui data driver: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteDriver($id)
+    {
+        $driver = Driver::with(['user', 'assignments'])->findOrFail($id);
+
+        $activeAssignments = $driver->assignments()->whereIn('status', ['pending', 'in_progress'])->count();
+        if ($activeAssignments > 0) {
+            return back()->with('error', "Driver '{$driver->user->name}' tidak dapat dihapus karena masih memiliki {$activeAssignments} tugas aktif.");
+        }
+
+        DB::beginTransaction();
+        try {
+            $driverName = $driver->user ? $driver->user->name : 'Driver #' . $driver->id_driver;
+            $user = $driver->user;
+
+            $driver->assignments()->delete();
+            $driver->locations()->delete();
+            $driver->delete();
+            if ($user) {
+                $user->delete();
+            }
+
+            DB::commit();
+            return back()->with('success', "Driver '{$driverName}' berhasil dihapus.");
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menghapus driver: ' . $e->getMessage());
         }
     }
 }

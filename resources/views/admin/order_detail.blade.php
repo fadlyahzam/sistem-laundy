@@ -270,6 +270,21 @@
                                 ✓ Lunas pada: {{ $order->invoice->paid_at->format('d M Y, H:i') }}
                             </div>
                         @endif
+
+                        <div class="pt-2 border-t border-slate-100 flex gap-2">
+                            <a href="{{ route('admin.orders.print_invoice', $order->id_order) }}" 
+                               class="flex-1 py-2 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-center font-bold text-[11px] transition flex items-center justify-center gap-1.5 border border-slate-200 shadow-xs">
+                                <i class="fa-solid fa-print text-slate-500"></i>
+                                <span>Cetak Invoice</span>
+                            </a>
+                            @if($order->invoice->status === 'paid')
+                                <a href="{{ route('admin.orders.print_receipt', $order->id_order) }}" 
+                                   class="flex-1 py-2 px-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-center font-bold text-[11px] transition flex items-center justify-center gap-1.5 border border-emerald-200 shadow-xs">
+                                    <i class="fa-solid fa-receipt text-emerald-600"></i>
+                                    <span>Bukti Bayar</span>
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 @else
                     <p class="text-xs text-slate-400 italic">Invoice belum diterbitkan.</p>
@@ -304,7 +319,7 @@
                     <span class="text-[10px] font-semibold text-[#3da4e0]">Pickup & Antar</span>
                 </h3>
 
-                @if($order->pickup_photo_url || $order->delivery_photo_url)
+                @if($order->pickup_photo_url || $order->delivery_photo_url || $order->proof_photo_url)
                     <div class="space-y-3 text-xs">
                         @if($order->pickup_photo_url)
                             <div class="space-y-1.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
@@ -329,6 +344,19 @@
                                 </div>
                                 <a href="{{ $order->delivery_photo_url }}" target="_blank" class="block aspect-video rounded-lg overflow-hidden border border-slate-200 group relative bg-black/5">
                                     <img src="{{ $order->delivery_photo_url }}" alt="Bukti Foto Pengantaran" class="w-full h-full object-cover group-hover:scale-105 transition duration-200">
+                                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold">
+                                        Perbesar Foto ↗
+                                    </div>
+                                </a>
+                            </div>
+                        @elseif($order->proof_photo_url && !$order->pickup_photo_url)
+                            <div class="space-y-1.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-700 text-[11px]">Bukti Dokumentasi Driver</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-100 text-sky-800">Dokumentasi</span>
+                                </div>
+                                <a href="{{ $order->proof_photo_url }}" target="_blank" class="block aspect-video rounded-lg overflow-hidden border border-slate-200 group relative bg-black/5">
+                                    <img src="{{ $order->proof_photo_url }}" alt="Bukti Foto Driver" class="w-full h-full object-cover group-hover:scale-105 transition duration-200">
                                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold">
                                         Perbesar Foto ↗
                                     </div>

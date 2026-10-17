@@ -147,7 +147,14 @@ class DatabaseSeeder extends Seeder
 
         Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Jas / Blazer Formal'], ['unit_tariff' => 25000, 'is_active' => true]);
         Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Gaun Pesta / Kebaya'], ['unit_tariff' => 35000, 'is_active' => true]);
-        Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Sepatu Sneakers'], ['unit_tariff' => 30000, 'is_active' => true]);
+        Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Sepatu Sneakers / Kulit'], ['unit_tariff' => 30000, 'is_active' => true]);
+        Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Kemeja / Blus Formal'], ['unit_tariff' => 15000, 'is_active' => true]);
+        Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Celana Panjang / Jeans'], ['unit_tariff' => 15000, 'is_active' => true]);
+        Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Jaket / Hoodie / Sweater'], ['unit_tariff' => 20000, 'is_active' => true]);
+        Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Bedcover / Selimut Satuan'], ['unit_tariff' => 25000, 'is_active' => true]);
+        Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Tas / Ransel'], ['unit_tariff' => 25000, 'is_active' => true]);
+        Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Gorden / Tirai'], ['unit_tariff' => 20000, 'is_active' => true]);
+        Kategori::firstOrCreate(['id_layanan' => $layanan3->id_layanan, 'name' => 'Karpet Tebal'], ['unit_tariff' => 30000, 'is_active' => true]);
 
         // 3. Seed Realistic Sample Orders for Demo Testing
         

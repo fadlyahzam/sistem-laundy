@@ -29,7 +29,11 @@ class Assignment extends Model
     {
         $photo = $this->proof_photo ?? ($this->type === 'pickup' ? $this->pickup_photo : $this->delivery_photo);
         if ($photo) {
-            return str_starts_with($photo, 'http') ? $photo : asset('storage/' . $photo);
+            if (str_starts_with($photo, 'http')) {
+                return $photo;
+            }
+            $cleanPath = preg_replace('#^storage/#', '', ltrim($photo, '/'));
+            return asset('storage/' . $cleanPath);
         }
         return null;
     }

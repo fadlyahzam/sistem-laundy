@@ -184,7 +184,7 @@ class PelangganController extends Controller
 
     public function payOrder(Request $request, $id)
     {
-        $order = Order::with('invoice.latestPayment')
+        $order = Order::with(['invoice.latestPayment', 'items.layanan', 'items.kategori'])
             ->where('id_user', Auth::id())
             ->findOrFail($id);
 
@@ -195,8 +195,9 @@ class PelangganController extends Controller
         }
 
         if ($invoice->status === 'paid') {
-            return redirect()->route('pelanggan.orders.show', $order->id_order)
-                ->with('success', 'Tagihan ini sudah lunas.');
+            $payment = $invoice->latestPayment;
+            $expiresAt = $payment?->expires_at;
+            return view('pelanggan.pembayaran', compact('order', 'invoice', 'payment', 'latestPayment', 'expiresAt'));
         }
 
         // Get or generate Midtrans QRIS charge (with explicit 30 min expiry)

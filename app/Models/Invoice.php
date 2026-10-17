@@ -47,4 +47,38 @@ class Invoice extends Model
     {
         return $this->hasOne(Payment::class, 'id_invoice', 'id_invoice')->latestOfMany('id_payment');
     }
+
+    public function getTerbilangAttribute(): string
+    {
+        $amount = (int) round((float) $this->total_amount);
+        if ($amount <= 0) {
+            return 'Nol Rupiah';
+        }
+        return trim(self::numberToWords($amount)) . ' Rupiah';
+    }
+
+    public static function numberToWords(int $number): string
+    {
+        $words = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
+        if ($number < 12) {
+            return $words[$number];
+        } elseif ($number < 20) {
+            return self::numberToWords($number - 10) . ' Belas';
+        } elseif ($number < 100) {
+            return self::numberToWords(intdiv($number, 10)) . ' Puluh ' . self::numberToWords($number % 10);
+        } elseif ($number < 200) {
+            return 'Seratus ' . self::numberToWords($number - 100);
+        } elseif ($number < 1000) {
+            return self::numberToWords(intdiv($number, 100)) . ' Ratus ' . self::numberToWords($number % 100);
+        } elseif ($number < 2000) {
+            return 'Seribu ' . self::numberToWords($number - 1000);
+        } elseif ($number < 1000000) {
+            return self::numberToWords(intdiv($number, 1000)) . ' Ribu ' . self::numberToWords($number % 1000);
+        } elseif ($number < 1000000000) {
+            return self::numberToWords(intdiv($number, 1000000)) . ' Juta ' . self::numberToWords($number % 1000000);
+        } elseif ($number < 1000000000000) {
+            return self::numberToWords(intdiv($number, 1000000000)) . ' Miliar ' . self::numberToWords($number % 1000000000);
+        }
+        return (string) $number;
+    }
 }
